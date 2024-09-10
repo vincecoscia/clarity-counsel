@@ -5,6 +5,9 @@ import { signOut } from 'next-auth/react';
 import { Button } from "~/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
 import { File, Upload, Settings, LogOut, Menu } from 'lucide-react';
+import { GeistSans } from 'geist/font/sans';
+import { cn } from "~/lib/utils"
+
 
 type LayoutProps = {
   children: ReactNode;
@@ -19,26 +22,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const SidebarContent = () => (
-    <nav className="flex flex-col space-y-2">
+    <nav className={cn("flex flex-col space-y-2", GeistSans.className)} >
       <Link href="/dashboard" passHref>
-        <Button variant="ghost" className={`justify-start ${router.pathname === '/dashboard' ? 'bg-gray-100' : ''}`}>
+        <Button variant="ghost" className={`justify-start w-full ${router.pathname === '/dashboard' ? 'bg-gray-100' : ''}`}>
           <File className="mr-2 h-4 w-4" />
           Documents
         </Button>
       </Link>
       <Link href="/upload" passHref>
-        <Button variant="ghost" className={`justify-start ${router.pathname === '/upload' ? 'bg-gray-100' : ''}`}>
+        <Button variant="ghost" className={`justify-start  w-full ${router.pathname === '/upload' ? 'bg-gray-100' : ''}`}>
           <Upload className="mr-2 h-4 w-4" />
           Upload
         </Button>
       </Link>
       <Link href="/account-settings" passHref>
-        <Button variant="ghost" className={`justify-start ${router.pathname === '/account-settings' ? 'bg-gray-100' : ''}`}>
+        <Button variant="ghost" className={`justify-start w-full ${router.pathname === '/account-settings' ? 'bg-gray-100' : ''}`}>
           <Settings className="mr-2 h-4 w-4" />
           Account Settings
         </Button>
       </Link>
-      <Button variant="ghost" className="justify-start text-red-500" onClick={handleLogout}>
+      <Button variant="ghost" className="justify-start w-full text-red-500 hover:bg-red-600/10 hover:text-red-500" onClick={handleLogout}>
         <LogOut className="mr-2 h-4 w-4" />
         Logout
       </Button>
