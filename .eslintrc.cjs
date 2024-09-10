@@ -15,6 +15,7 @@ const config = {
   "rules": {
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
+    
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
@@ -29,14 +30,11 @@ const config = {
       }
     ],
     "@typescript-eslint/require-await": "off",
-    "@typescript-eslint/no-misused-promises": [
-      "error",
-      {
+    "@typescript-eslint/no-misused-promises": [2, {
         "checksVoidReturn": {
           "attributes": false
         }
-      }
-    ]
+      }],
   }
 }
 module.exports = config;

@@ -20,11 +20,11 @@ import {
   navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu";
 import { cn } from "~/lib/utils";
+import Navigation from "~/components/Navigation";
 
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.post.hello.useQuery({ text: "from tRPC" });
 
   return (
     <>
@@ -36,36 +36,9 @@ export default function Home() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background px-4 lg:px-0">
         <header className="container mx-auto py-4">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle()}
-                  href="/"
-                >
-                  Home
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle()}
-                  href="/about"
-                >
-                  About
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle()}
-                  href="/pricing"
-                >
-                  Pricing
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <Navigation />
         </header>
 
         <main className="container mx-auto py-16">
@@ -76,7 +49,9 @@ export default function Home() {
             <p className="mb-8 text-xl">
               Simplify your legal documents with AI
             </p>
+            <Link href="/signup" passHref legacyBehavior>
             <Button size="lg">Get Started</Button>
+            </Link>
           </div>
 
           <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
