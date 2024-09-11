@@ -99,6 +99,8 @@ const SignUp: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
+  const { data: userSubscription } = api.subscription.getUserSubscription.useQuery();
+
   const selectPlanMutation = api.subscription.selectPlan.useMutation();
 
   const handleSignIn = async (provider: 'google' | 'email') => {
@@ -126,7 +128,7 @@ const SignUp: React.FC = () => {
     }
   };
 
-  if (session) {
+  if (session && !userSubscription) {
     return (
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-6 text-center">Select a Plan</h1>
@@ -147,6 +149,11 @@ const SignUp: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (session && userSubscription) {
+    // Redirect to dashboard if user already has a subscription
+    router.push('/dashboard');
   }
 
   return (

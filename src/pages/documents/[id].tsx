@@ -61,10 +61,10 @@ const DocumentView = () => {
   return (
     <Layout>
       <div className="flex justify-between items-center mb-4">
-        <Button variant="outline" onClick={() => router.back()}>
-          <ChevronLeft className="mr-2 h-4 w-4" /> Back
-        </Button>
-        <div>
+      <div>
+        <Button className="" variant="default" onClick={handleAnalyze}>Analyze Document</Button>
+      </div>
+        <div className="flex items-center">
           {prevDocumentId && (
             <Button variant="outline" className="mr-2" onClick={() => router.push(`/documents/${prevDocumentId}`)}>
               <ChevronLeft className="mr-2 h-4 w-4" /> Previous
@@ -87,9 +87,7 @@ const DocumentView = () => {
         </CardContent>
       </Card>
 
-      <div className="mt-4">
-        <Button onClick={handleAnalyze}>Analyze Document</Button>
-      </div>
+
 
       <AlertDialog open={isAnalyzeDialogOpen} onOpenChange={setIsAnalyzeDialogOpen}>
         <AlertDialogContent>
