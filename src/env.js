@@ -29,6 +29,7 @@ export const env = createEnv({
     STRIPE_BASIC_PRICE_ID: z.string(),
     STRIPE_PRO_PRICE_ID: z.string(),
     STRIPE_WEBHOOK_SECRET: z.string(),
+    ANTHROPIC_API_KEY: z.string(),
   },
 
   /**
@@ -56,6 +57,7 @@ export const env = createEnv({
     STRIPE_BASIC_PRICE_ID: process.env.STRIPE_BASIC_PRICE_ID,
     STRIPE_PRO_PRICE_ID: process.env.STRIPE_PRO_PRICE_ID,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

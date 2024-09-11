@@ -6,7 +6,8 @@ import {
   fileUploadProcedure,
 } from "~/server/api/trpc";
 import { parseAndValidateFile } from "~/utils/fileParser"; // Adjust the import path as necessary
-import fs from 'fs/promises';
+import { simplifyDocument } from "~/server/ai/claude";
+import { SubscriptionService } from "~/server/services/subscriptionService";
 
 export const documentRouter = createTRPCRouter({
   upload: protectedProcedure
@@ -55,6 +56,61 @@ export const documentRouter = createTRPCRouter({
     return document;
   }),
 
+  simplify: protectedProcedure
+  .input(z.string())
+  .mutation(async ({ ctx, input }) => {
+    const document = await ctx.db.document.findUnique({
+      where: { id: input },
+      include: { simplifications: true },
+    });
+
+    if (!document || document.userId !== ctx.session.user.id) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Document not found",
+      });
+    }
+
+    // Check if simplification already exists
+    if (document.simplifications.length > 0) {
+      return document.simplifications[0];
+    }
+
+    const subscriptionService = new SubscriptionService(ctx.db);
+
+    // Check and decrement usage
+    try {
+      await subscriptionService.checkAndDecrementUsage(ctx.session.user.id);
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to check subscription usage",
+      });
+    }
+
+    try {
+      const simplifiedContent = await simplifyDocument(document.content);
+
+      const simplification = await ctx.db.simplification.create({
+        data: {
+          documentId: document.id,
+          simplifiedContent,
+        },
+      });
+
+      return simplification;
+    } catch (error) {
+      console.error('Error during document simplification:', error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to simplify document. Please try again later.",
+      });
+    }
+  }),
+
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const { db, session } = ctx;
 
@@ -72,6 +128,7 @@ export const documentRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const document = await ctx.db.document.findUnique({
         where: { id: input },
+        include: { simplifications: true },
       });
 
       if (!document || document.userId !== ctx.session.user.id) {
