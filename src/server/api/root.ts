@@ -1,4 +1,5 @@
 import { subscriptionRouter } from "~/server/api/routers/subscription";
+import { documentRouter } from "~/server/api/routers/document";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -8,6 +9,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   subscription: subscriptionRouter,
+  document: documentRouter,
 });
 
 // export type definition of API

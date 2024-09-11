@@ -10,6 +10,12 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20",
 });
 
+const USES_PER_PLAN = {
+  FREE: 1,
+  BASIC: 10,
+  PRO: 100,
+};
+
 export const config = {
   api: {
     bodyParser: false,
@@ -48,6 +54,7 @@ export default async function handler(
           data: {
             userId: session.metadata.userId,
             plan: plan,
+            usesLeft: USES_PER_PLAN[plan],
           },
         });
       } else {

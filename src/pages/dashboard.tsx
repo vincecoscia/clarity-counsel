@@ -1,73 +1,57 @@
-import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import React from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
-import { Upload } from 'lucide-react';
-import Layout from '~/components/Layout';  // Adjust the import path as necessary
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
+import Layout from "~/components/Layout";
+import DocumentUpload from "~/components/DocumentUpload"; // Import the DocumentUpload component
 import { api } from "~/utils/api";
 
 const Dashboard: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isUploading, setIsUploading] = useState(false);
+  const documents = api.document.getAll.useQuery();
+  const utils = api.useContext();
 
-  // Mock data for documents - replace with actual data fetching
-  const documents = [
-    { id: 1, name: 'Contract.pdf', uploadDate: '2023-05-15', status: 'Simplified' },
-    { id: 2, name: 'Agreement.docx', uploadDate: '2023-05-14', status: 'Original' },
-    { id: 3, name: 'Terms.pdf', uploadDate: '2023-05-13', status: 'Simplified' },
-  ];
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
-      // Implement file upload logic here
-      console.log('Uploading file:', file.name);
-      // Simulating upload delay
-      setTimeout(() => setIsUploading(false), 2000);
-    }
+  const handleViewDocument = (id: string) => {
+    router.push(`/documents/${id}`);
   };
 
-  if (status === 'loading') {
+  const handleUploadSuccess = () => {
+    // Refetch the documents list after a successful upload
+    void utils.document.getAll.invalidate();
+  };
+
+  if (status === "loading") {
     return <div>Loading...</div>;
   }
 
-  if (status === 'unauthenticated') {
-    router.push('/signin');
+  if (status === "unauthenticated") {
+    void router.push("/signin");
     return null;
   }
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="mb-6 text-3xl font-bold">Dashboard</h1>
 
-      {/* Upload Card */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Upload New Document</CardTitle>
-          <CardDescription>Upload a document to simplify</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Label htmlFor="file-upload" className="cursor-pointer">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-500">PDF, DOCX, TXT (max. 10MB)</p>
-            </div>
-            <Input id="file-upload" type="file" className="hidden" onChange={handleFileUpload} />
-          </Label>
-        </CardContent>
-        <CardFooter>
-          <Button disabled={isUploading} className="w-full">
-            {isUploading ? 'Uploading...' : 'Upload Document'}
-          </Button>
-        </CardFooter>
-      </Card>
+      {/* DocumentUpload Component */}
+      <div className="mb-8">
+        <DocumentUpload onUploadSuccess={handleUploadSuccess} />
+      </div>
 
       {/* Documents Table */}
       <Card>
@@ -85,13 +69,21 @@ const Dashboard: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {documents.map((doc) => (
+              {documents.data?.map((doc) => (
                 <TableRow key={doc.id}>
-                  <TableCell>{doc.name}</TableCell>
-                  <TableCell>{doc.uploadDate}</TableCell>
-                  <TableCell>{doc.status}</TableCell>
+                  <TableCell>{doc.title}</TableCell>
+                  <TableCell>{doc.uploadedAt.toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">View</Button>
+                    {doc.simplifications.length > 0 ? "Simplified" : "Original"}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewDocument(doc.id)}
+                    >
+                      View
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

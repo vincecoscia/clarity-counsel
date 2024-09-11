@@ -81,12 +81,14 @@ model Simplification {
 }
 
 model Subscription {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan      Plan
-  startDate DateTime @default(now())
-  endDate   DateTime?
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            Plan
+  startDate       DateTime @default(now())
+  endDate         DateTime?
+  usesLeft        Int      // New field to track remaining uses
+  lastResetDate   DateTime @default(now()) // To track when the uses were last reset
 }
 
 enum Plan {
