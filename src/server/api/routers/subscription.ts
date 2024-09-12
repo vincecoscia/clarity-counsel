@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import {
@@ -88,6 +89,50 @@ export const subscriptionRouter = createTRPCRouter({
       }
 
       return subscription;
+    }),
+
+    cancelSubscription: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const { db, session } = ctx;
+
+      const subscription = await db.subscription.findUnique({
+        where: { userId: session.user.id },
+      });
+
+      if (!subscription) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Subscription not found",
+        });
+      }
+
+      if (subscription.plan === "FREE") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Free subscriptions cannot be cancelled",
+        });
+      }
+
+      // Cancel the subscription in Stripe
+      const stripeSubscription = await stripe.subscriptions.list({
+        customer: session.user.id,
+      });
+
+      if (stripeSubscription.data.length > 0) {
+        await stripe.subscriptions.del(stripeSubscription.data[0].id);
+      }
+
+      // Update the subscription in the database
+      await db.subscription.update({
+        where: { id: subscription.id },
+        data: { 
+          plan: "FREE",
+          usesLeft: 1,
+          endDate: new Date(),
+        },
+      });
+
+      return { success: true };
     }),
 
   useAnalysis: protectedProcedure

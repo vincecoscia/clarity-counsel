@@ -1,4 +1,4 @@
-// pages/api/webhooks/stripe.ts
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { buffer } from "micro";
 import Stripe from "stripe";
 import { db } from "~/server/db";
@@ -50,11 +50,17 @@ export default async function handler(
       if (session.metadata?.userId && session.metadata?.plan) {
         const plan = session.metadata.plan as Plan;
         
+        // Fetch the subscription details from Stripe
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+
+        const renewalDate = new Date(subscription.current_period_end * 1000);
+
         await db.subscription.create({
           data: {
             userId: session.metadata.userId,
             plan: plan,
             usesLeft: USES_PER_PLAN[plan],
+            renewalDate: renewalDate,
           },
         });
       } else {

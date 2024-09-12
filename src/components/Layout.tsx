@@ -17,8 +17,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
+    await router.push('/');
     await signOut({ redirect: false });
-    router.push('/');
   };
 
   const SidebarContent = () => (

@@ -86,6 +86,7 @@ model Subscription {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan            Plan
   startDate       DateTime @default(now())
+  renewalDate     DateTime?
   endDate         DateTime?
   usesLeft        Int      // New field to track remaining uses
   lastResetDate   DateTime @default(now()) // To track when the uses were last reset
